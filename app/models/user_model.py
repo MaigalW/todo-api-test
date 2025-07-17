@@ -39,3 +39,7 @@ class UserInDB(UserBase):
         "arbitrary_types_allowed": True,
         "json_encoders": {ObjectId: str}
     }
+
+class UserOut(BaseModel):
+    username: str
+    role: str

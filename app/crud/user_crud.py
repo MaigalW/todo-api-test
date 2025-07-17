@@ -1,6 +1,7 @@
-from app.models.user_model import UserCreate, UserInDB, PyObjectId
+from app.models.user_model import *
 from app.core.security import hash_password
 from app.database.connection import client
+
 from bson import ObjectId
 
 db = client.todo_db
@@ -26,3 +27,13 @@ async def get_user_by_id(user_id: str) -> UserInDB | None:
         user["_id"] = PyObjectId(user["_id"])  # convertir a PyObjectId
         return UserInDB(**user)
     return None
+
+async def delete_user_by_username(username: str) -> bool:
+    result = await user_collection.delete_one({"username": username})
+    return result.deleted_count == 1
+
+async def list_all_users() -> list[UserOut]:
+    users = []
+    async for doc in user_collection.find():
+        users.append(UserOut(**doc))
+    return users

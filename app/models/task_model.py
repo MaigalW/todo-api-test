@@ -14,9 +14,12 @@ class TaskBase(BaseModel):
     status: TaskStatus
 
 class TaskCreate(TaskBase):
+    #owner_id: Optional[str] = None
     pass
 
 class Task(TaskBase):
-    id: Optional[str] = Field(alias="_id")  # Para compatibilidad con MongoDB
+    id: Optional[str] = Field(alias="_id")
     created_at: datetime
     updated_at: datetime
+    owner_id: Optional[str] = None
+
