@@ -21,7 +21,7 @@ async def create_user(
 @router.delete("/{username}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     username: str,
-    _: UserInDB = Depends(require_admin)  # 👈 solo admins pueden eliminar usuarios
+    _: UserInDB = Depends(require_admin) 
 ):
     user = await get_user_by_username(username)
     if not user:

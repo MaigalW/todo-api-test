@@ -66,7 +66,7 @@ async def update_task(task_id: str, task_data: TaskCreate, current_user: UserInD
     if current_user.role != "admin":
         query["owner_id"] = str(current_user.id)
 
-    update_result = await task_collection.update_one(query, {"$set": task_data.dict(exclude_unset=True)})
+    update_result = await task_collection.update_one(query, {"$set": task_data.model_dump(exclude_unset=True)})
 
     if update_result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Task not found or not authorized")

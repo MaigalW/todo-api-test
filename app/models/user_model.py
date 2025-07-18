@@ -11,9 +11,9 @@ class PyObjectId(ObjectId):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v, info: ValidationInfo = None):  # añade el parámetro info opcional
+    def validate(cls, v, info: ValidationInfo = None):
         if isinstance(v, ObjectId):
-            return cls(v)  # convertir ObjectId normal a PyObjectId
+            return cls(v)
         if not ObjectId.is_valid(v):
             raise ValueError("Invalid ObjectId")
         return cls(v)
