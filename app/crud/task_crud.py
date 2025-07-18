@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 from bson import ObjectId
 from app.database.connection import task_collection
-from pymongo import ReturnDocument
-from app.models.task_model import TaskCreate, Task, TaskStatus
+from app.models.task_model import TaskCreate, Task
 from app.models.user_model import UserInDB
+from fastapi import HTTPException
 
 from typing import Optional
 
@@ -50,7 +50,6 @@ async def list_tasks(
 async def get_task(task_id: str, current_user: UserInDB) -> Task | None:
     query = {"_id": ObjectId(task_id)}
     
-    # Si no es admin, añadimos condición de propietario
     if current_user.role != "admin":
         query["owner_id"] = str(current_user.id)
 
@@ -62,21 +61,22 @@ async def get_task(task_id: str, current_user: UserInDB) -> Task | None:
     
     return None
 
-async def update_task(task_id: str, task_data: TaskCreate, current_user: UserInDB) -> Task | None:
+async def update_task(task_id: str, task_data: TaskCreate, current_user: UserInDB) -> Task:
     query = {"_id": ObjectId(task_id)}
     if current_user.role != "admin":
         query["owner_id"] = str(current_user.id)
 
-    now = datetime.now(timezone.utc)
-    updated = await task_collection.find_one_and_update(
-        query,
-        {"$set": {**task_data.model_dump(), "updated_at": now}},
-        return_document=ReturnDocument.AFTER
-    )
-    if updated:
-        updated["_id"] = str(updated["_id"])
-        return Task(**updated)
-    return None
+    update_result = await task_collection.update_one(query, {"$set": task_data.dict(exclude_unset=True)})
+
+    if update_result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Task not found or not authorized")
+
+    updated_task = await task_collection.find_one({"_id": ObjectId(task_id)})
+    if not updated_task:
+        raise HTTPException(status_code=404, detail="Task not found after update")
+
+    updated_task["_id"] = str(updated_task["_id"])
+    return Task(**updated_task)
 
 async def delete_task(task_id: str, current_user: UserInDB) -> bool:
     query = {"_id": ObjectId(task_id)}

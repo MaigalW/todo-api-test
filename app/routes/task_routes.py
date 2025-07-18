@@ -60,7 +60,7 @@ async def get_tasks(
 
 @router.get("/{task_id}", response_model=Task)
 async def get_task(task_id: str, current_user: UserInDB = Depends(get_current_user)):
-    task = await task_crud.get_task(task_id)
+    task = await task_crud.get_task(task_id, current_user)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     if task.owner_id != str(current_user.id) and current_user.role != "admin":
@@ -74,22 +74,22 @@ async def update_task(
     task_data: TaskCreate,
     current_user: UserInDB = Depends(get_current_user)
 ):
-    task = await task_crud.get_task(task_id)
+    task = await task_crud.get_task(task_id, current_user)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     if task.owner_id != str(current_user.id) and current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to update this task")
 
-    return await task_crud.update_task(task_id, task_data)
-
+    return await task_crud.update_task(task_id, task_data, current_user)
 
 @router.delete("/{task_id}")
 async def delete_task(task_id: str, current_user: UserInDB = Depends(get_current_user)):
-    task = await task_crud.get_task(task_id)
+    task = await task_crud.get_task(task_id, current_user)
+
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     if task.owner_id != str(current_user.id) and current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to delete this task")
 
-    deleted = await task_crud.delete_task(task_id)
+    deleted = await task_crud.delete_task(task_id, current_user)
     return {"message": "Task deleted"}
