@@ -2,11 +2,12 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from app.models.user_model import UserCreate, UserInDB
 from app.crud.user_crud import *
 from app.auth.dependencies import require_admin
+from app.crud.user_crud import create_user as create_user_crud
 
 router = APIRouter(prefix="/users", tags=["User"])
 
 @router.post("/create_user", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
-async def create_user_endpoint(
+async def create_user(
     user_data: UserCreate,
     _: UserInDB = Depends(require_admin)
 ):
@@ -14,9 +15,8 @@ async def create_user_endpoint(
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    new_user = await create_user_endpoint(user_data)
+    new_user = await create_user_crud(user_data)
     return new_user
-
 
 @router.delete("/{username}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(

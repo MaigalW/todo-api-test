@@ -3,7 +3,7 @@ from app.routes import task_routes, auth_routes, user_routes, protected_routes
 from dotenv import load_dotenv
 import os
 from contextlib import asynccontextmanager
-from app.crud.user_crud import get_user_by_username, create_user_endpoint
+from app.crud.user_crud import get_user_by_username, create_user
 from app.models.user_model import UserCreate
 
 load_dotenv()
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     admin_user = await get_user_by_username("admin")
     if not admin_user:
         admin = UserCreate(username="admin", password="admin", role="admin")
-        await create_user_endpoint(admin)
+        await create_user(admin)
         logger.info("Admin user created with username: admin and password: admin")
     else:
         logger.info("Admin user already exists.")
