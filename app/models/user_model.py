@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Literal
 from bson import ObjectId
-from pydantic import GetJsonSchemaHandler
-from pydantic.json_schema import JsonSchemaValue
 from pydantic import ValidationInfo
 
 class PyObjectId(ObjectId):
