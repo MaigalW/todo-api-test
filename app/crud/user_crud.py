@@ -7,7 +7,7 @@ from bson import ObjectId
 db = client.todo_db
 user_collection = db.users
 
-async def create_user(user_data: UserCreate) -> UserInDB:
+async def create_user_endpoint(user_data: UserCreate) -> UserInDB:
     user_dict = user_data.model_dump()
     user_dict["hashed_password"] = hash_password(user_dict.pop("password"))
     result = await user_collection.insert_one(user_dict)

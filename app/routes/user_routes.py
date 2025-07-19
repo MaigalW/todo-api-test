@@ -6,7 +6,7 @@ from app.auth.dependencies import require_admin
 router = APIRouter(prefix="/users", tags=["User"])
 
 @router.post("/create_user", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
-async def create_user(
+async def create_user_endpoint(
     user_data: UserCreate,
     _: UserInDB = Depends(require_admin)
 ):
@@ -14,7 +14,7 @@ async def create_user(
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    new_user = await create_user(user_data)
+    new_user = await create_user_endpoint(user_data)
     return new_user
 
 

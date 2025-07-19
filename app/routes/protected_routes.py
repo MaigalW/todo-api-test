@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from app.auth.dependencies import require_admin
 from app.models.user_model import UserInDB
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
+router = APIRouter(prefix="/Protected", tags=["Protected"])
 
 @router.get("/dashboard")
 async def admin_dashboard(current_user: UserInDB = Depends(require_admin)):
